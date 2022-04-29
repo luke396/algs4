@@ -60,8 +60,8 @@ public class PercolationStats {
 
     // test client (see below)
     public static void main(String[] args) {
-        if (args.length != 2) { // 如果参数不是2个，抛出异常
-            throw new IllegalArgumentException("Usage: java PercolationStats <n> <trials>");
+        if (StdIn.isEmpty()) {
+            StdOut.println("Usage: java PercolationStats <n> <trials>");
         } else {
             int n = StdIn.readInt();
             int t = StdIn.readInt();
