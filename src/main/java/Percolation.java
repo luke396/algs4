@@ -19,15 +19,6 @@ public class Percolation {
         uf = new WeightedQuickUnionUF(n * n + 2); // initialize n closed sites. + two virtual sites
         // so the site is from 1 to n^2
         grid = new boolean[n][n];
-
-        // connect the virtual top to the fist row
-        for (int i = 0; i < n + 1; i++) {
-            uf.union(0, i);
-        }
-        // connect the virtual bottom to the last row
-        for (int i = 0; i < n; i++) {
-            uf.union(n * n + 1, n * n - i);
-        }
     }
 
     // opens the site (row, col) if it is not open already
@@ -39,8 +30,19 @@ public class Percolation {
         }
         grid[row - 1][col - 1] = true; // open the site
 
-        // to see if the site around open and connect to the open site
         int thisId = toId(row, col);
+
+        // if the site is on the top row, connect it to the virtual top
+        if (row == 1) {
+            uf.union(thisId, 0);
+        }
+
+        // if the site is on the bottom row, connect it to the virtual bottom
+        if (row == grid.length) {
+            uf.union(thisId, grid.length * grid.length + 1);
+        }
+
+        // to see if the site around open and connect to the open site
         int[] up = {row + 1, col};
         int[] down = {row - 1, col};
         int[] left = {row, col - 1};
