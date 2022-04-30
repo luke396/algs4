@@ -74,35 +74,24 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         validate(row, col);
 
-        if (!isOpen(row, col)) { // 不是open的不能是full
+        if (!isOpen(row, col)) { // if the site is blocked, it is not full
             return false;
         }
 
-        int[] rootOfFirst;
-        rootOfFirst = new int[grid.length];
-        for (int i = 0; i < grid.length; i++) {
-            rootOfFirst[i] = uf.find(i); // i , is the id of first row
-        }
-
-        int thisRoot = uf.find(toId(row, col));
-        for (int root : rootOfFirst) {
-            if (thisRoot == root) {
-                return true;
-            }
-        }
-
-        return false;
-
+        int[] up = {row + 1, col};
+        int[] down = {row - 1, col};
+        int[] left = {row, col - 1};
+        int[] right = {row, col + 1};
+        // the symbol beside is recursion
+        return isFull(up[0], up[1]) || isFull(down[0], down[1]) || isFull(left[0], left[1]) || isFull(right[0], right[1]);
     }
 
     // returns the number of open sites
     public int numberOfOpenSites() {
         int count = 0;
-        for (boolean[] ints : grid) {  // grid is 2 dimensional
-            for (boolean anInt : ints) {
-                if (anInt) {
-                    count = count + 1;
-                }
+        for (boolean[] row : grid) {  // grid is a 2 dimensional boolean array
+            for (boolean col : row) {
+                count += col ? 1 : 0;
             }
         }
         return count;
@@ -119,7 +108,6 @@ public class Percolation {
                 return true;
             }
         }
-
         return false;
     }
 
