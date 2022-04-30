@@ -92,7 +92,7 @@ public class Percolation {
         // if the site is connected to the virtual top site, it is full
         // 0 is not immutable
         // there is a method in uf, called connected, which is used to check if the two sites are connected
-        return uf.connected(toId(row, col), 0); // 0 is the virtual top
+        return uf.find(toId(row, col)) == uf.find(0); // 0 is the virtual top
     }
 
     // returns the number of open sites
@@ -117,27 +117,27 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation perc = new Percolation(5);
+        Percolation percolation = new Percolation(5);
 
-        perc.open(1, 1);
+        percolation.open(1, 1);
 
-        if (perc.isOpen(1, 1)) {
+        if (percolation.isOpen(1, 1)) {
             StdOut.println("1,1 is open.");
         } else {
             StdOut.println("1,1 is blocked.");
         }
-        if (perc.isFull(1, 1)) {
+        if (percolation.isFull(1, 1)) {
             StdOut.println("1,1 is full.");
         } else {
             StdOut.println("1,1 is not full.");
         }
 
-        perc.open(2, 1);
-        if (perc.percolates()) {
+        percolation.open(2, 1);
+        if (percolation.percolates()) {
             StdOut.println("The system percolates.");
         } else {
             StdOut.println("The system does not percolate.");
         }
-        StdOut.printf("The number of open sites is %d.\n", perc.numberOfOpenSites());
+        StdOut.printf("The number of open sites is %d.\n", percolation.numberOfOpenSites());
     }
 }
