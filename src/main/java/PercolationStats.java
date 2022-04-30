@@ -54,16 +54,19 @@ public class PercolationStats {
 
     // test client (see below)
     public static void main(String[] args) {
+        int n = Integer.parseInt(args[0]); // for no command line argument
+        int t = Integer.parseInt(args[1]);
         if (!StdIn.isEmpty()) {
-            int n = StdIn.readInt();
-            int t = StdIn.readInt();
-            if (n <= 0 || t <= 0) {
-                throw new IllegalArgumentException("n and t must be greater than 0");
-            }
-            PercolationStats test = new PercolationStats(n, t);
-            StdOut.printf("mean=%.5f\n", test.mean());
-            StdOut.printf("stddev=%.5f\n", test.stddev());
-            StdOut.printf("95%% confidence interval=[%.5f, %.5f]\n", test.confidenceLo(), test.confidenceHi()); // 这里的%需要’%%‘进行转义
+            n = StdIn.readInt();
+            t = StdIn.readInt();
         }
+
+        if (n <= 0 || t <= 0) {
+            throw new IllegalArgumentException("n and t must be greater than 0");
+        }
+        PercolationStats test = new PercolationStats(n, t);
+        StdOut.printf("mean=%.5f\n", test.mean());
+        StdOut.printf("stddev=%.5f\n", test.stddev());
+        StdOut.printf("95%% confidence interval=[%.5f, %.5f]\n", test.confidenceLo(), test.confidenceHi()); // 这里的%需要’%%‘进行转义
     }
 }
