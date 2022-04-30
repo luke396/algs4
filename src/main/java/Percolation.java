@@ -4,6 +4,9 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
     // block is no connection, and open is connection
     // this is a dynamic programming problem
+    // id is using to represent the uf id, id 1 is connected to the uf 1, uf 0 is the virtual top.
+
+    // Remember to see the api of what will be used, it will reduce a lot of repetition.
     private final boolean[][] grid; // true is open, false is blocked
     private final WeightedQuickUnionUF uf;
 
@@ -42,6 +45,7 @@ public class Percolation {
         int[] down = {row - 1, col};
         int[] left = {row, col - 1};
         int[] right = {row, col + 1};
+
         connectAround(thisId, up);
         connectAround(thisId, down);
         connectAround(thisId, left);
@@ -86,7 +90,9 @@ public class Percolation {
             return false;
         }
         // if the site is connected to the virtual top site, it is full
-        return uf.find(toId(row, col)) == 0; // 0 is the virtual top
+        // 0 is not immutable
+        // there is a method in uf, called connected, which is used to check if the two sites are connected
+        return uf.connected(toId(row, col), 0); // 0 is the virtual top
     }
 
     // returns the number of open sites
@@ -111,9 +117,10 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation perc = new Percolation(1);
+        Percolation perc = new Percolation(5);
 
         perc.open(1, 1);
+
         if (perc.isOpen(1, 1)) {
             StdOut.println("1,1 is open.");
         } else {
@@ -124,12 +131,13 @@ public class Percolation {
         } else {
             StdOut.println("1,1 is not full.");
         }
+
+        perc.open(2, 1);
         if (perc.percolates()) {
             StdOut.println("The system percolates.");
         } else {
             StdOut.println("The system does not percolate.");
         }
-
         StdOut.printf("The number of open sites is %d.\n", perc.numberOfOpenSites());
     }
 }
