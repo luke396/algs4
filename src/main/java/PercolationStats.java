@@ -10,19 +10,23 @@ public class PercolationStats {
 
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials) {
+        if (n <= 0 || trials <= 0) {
+            throw new IllegalArgumentException("n and trials must be greater than 0");
+        }
+
         perOfOpen = new double[trials];
 
         for (int i = 0; i < trials; i++) { // i to control the number of trials
-            Percolation perc = new Percolation(n);
-            while (!perc.percolates()) {
+            Percolation percolation = new Percolation(n);
+            while (!percolation.percolates()) {
                 int row = StdRandom.uniform(1, n + 1); // random location uniformly [1, n+1)
                 int col = StdRandom.uniform(1, n + 1);
-                if (!perc.isOpen(row, col)) {
-                    perc.open(row, col);
+                if (!percolation.isOpen(row, col)) {
+                    percolation.open(row, col);
                 }
             }
             // when percolating, record the num.
-            perOfOpen[i] = (double) perc.numberOfOpenSites() / (n * n);
+            perOfOpen[i] = (double) percolation.numberOfOpenSites() / (n * n);
             // to ensure the percentage is a double, or the '/' with tow int will be int
         }
     }
@@ -56,17 +60,15 @@ public class PercolationStats {
     public static void main(String[] args) {
         int n = Integer.parseInt(args[0]); // for no command line argument
         int t = Integer.parseInt(args[1]);
+
         if (!StdIn.isEmpty()) {
             n = StdIn.readInt();
             t = StdIn.readInt();
         }
 
-        if (n <= 0 || t <= 0) {
-            throw new IllegalArgumentException("n and t must be greater than 0");
-        }
-        PercolationStats test = new PercolationStats(n, t);
-        StdOut.printf("mean=%.5f\n", test.mean());
-        StdOut.printf("stddev=%.5f\n", test.stddev());
-        StdOut.printf("95%% confidence interval=[%.5f, %.5f]\n", test.confidenceLo(), test.confidenceHi()); // 这里的%需要’%%‘进行转义
+        PercolationStats percolationStats = new PercolationStats(n, t);
+        StdOut.printf("mean=%.5f\n", percolationStats.mean());
+        StdOut.printf("stddev=%.5f\n", percolationStats.stddev());
+        StdOut.printf("95%% confidence interval=[%.5f, %.5f]\n", percolationStats.confidenceLo(), percolationStats.confidenceHi()); // 这里的%需要’%%‘进行转义
     }
 }

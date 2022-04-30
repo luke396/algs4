@@ -6,7 +6,6 @@ public class Percolation {
     // this is a dynamic programming problem
     private final boolean[][] grid; // true is open, false is blocked
     private final WeightedQuickUnionUF uf;
-    // id is the number from 0 to n^2-1
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -14,9 +13,18 @@ public class Percolation {
             throw new IllegalArgumentException("n must be greater than 0");
         }
 
-        uf = new WeightedQuickUnionUF(n * n); // initialize n closed sites.
-
+        uf = new WeightedQuickUnionUF(n * n + 2); // initialize n closed sites. + two virtual sites
+        // so the site is from 1 to n^2
         grid = new boolean[n][n];
+
+        // connect the virtual top to the fist row
+        for (int i = 0; i < n + 1; i++) {
+            uf.union(0, i);
+        }
+        // connect the virtual bottom to the last row
+        for (int i = 0; i < n; i++) {
+            uf.union(n * n + 1, n * n - i);
+        }
     }
 
     // opens the site (row, col) if it is not open already
@@ -58,7 +66,7 @@ public class Percolation {
 
     // 将gird转换为id
     private int toId(int row, int col) {
-        return (row - 1) * grid.length + col - 1;
+        return (row - 1) * grid.length + col; // because the id of 1 is the virtual top site
     }
 
 
@@ -77,16 +85,8 @@ public class Percolation {
         if (!isOpen(row, col)) { // if the site is blocked, it is not full
             return false;
         }
-
-        int thisRoot = uf.find(toId(row, col));
-
-        for (int i = 0; i < grid.length; i++) { // select every site in the top row
-            int rootOfFirst = uf.find(i); // i , is the id of first row
-            if (thisRoot == rootOfFirst) {
-                return true;
-            }
-        }
-        return false;
+        // if the site is connected to the virtual top site, it is full
+        return uf.find(toId(row, col)) == 0; // 0 is the virtual top
     }
 
     // returns the number of open sites
@@ -102,16 +102,11 @@ public class Percolation {
 
     // We say the system percolates if there is a full site in the bottom row.
     // does the system percolate?
+    // We can introduce a virtual top row and virtual bottom row.
+    // percolates iif the virtual top row and virtual bottom row are connected.
     // use the method of sorting
-    public boolean percolates() { // 是在验证是否连接 也就是问是否有一条路可以从上连接到下
-
-        boolean[] lastRow = grid[grid.length - 1]; // last row
-        for (int i = 0; i < lastRow.length; i++) {
-            if (lastRow[i] && isFull(grid.length, i + 1)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean percolates() {
+        return uf.find(0) == uf.find(grid.length * grid.length + 1);
     }
 
     // test client (optional)
