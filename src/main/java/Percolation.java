@@ -82,14 +82,15 @@ public class Percolation {
         int[] down = {row - 1, col};
         int[] left = {row, col - 1};
         int[] right = {row, col + 1};
-        if ((row == 1) && col == 1) {
+        if (row == 1) { // in the first row, if the site is open, it is full
             return true;
+        } else {
+            return isValidate(up[0], up[1]) && isFull(up[0], up[1]) ||
+                    (isValidate(down[0], down[1]) && isFull(down[0], down[1])) ||
+                    (isValidate(left[0], left[1]) && isFull(left[0], left[1]) ||
+                            (isValidate(right[0], right[1]) && isFull(right[0], right[1])));
+            // the symbol beside is recursion
         }
-        return isValidate(up[0], up[1]) && isFull(up[0], up[1]) ||
-                (isValidate(down[0], down[1]) && isFull(down[0], down[1])) ||
-                (isValidate(left[0], left[1]) && isFull(left[0], left[1]) ||
-                        (isValidate(right[0], right[1]) && isFull(right[0], right[1])));
-        // the symbol beside is recursion
     }
 
     // returns the number of open sites
