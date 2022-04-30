@@ -82,8 +82,14 @@ public class Percolation {
         int[] down = {row - 1, col};
         int[] left = {row, col - 1};
         int[] right = {row, col + 1};
+        if ((row == 1) && col == 1) {
+            return true;
+        }
+        return isValidate(up[0], up[1]) && isFull(up[0], up[1]) ||
+                (isValidate(down[0], down[1]) && isFull(down[0], down[1])) ||
+                (isValidate(left[0], left[1]) && isFull(left[0], left[1]) ||
+                        (isValidate(right[0], right[1]) && isFull(right[0], right[1])));
         // the symbol beside is recursion
-        return isFull(up[0], up[1]) || isFull(down[0], down[1]) || isFull(left[0], left[1]) || isFull(right[0], right[1]);
     }
 
     // returns the number of open sites
@@ -91,8 +97,8 @@ public class Percolation {
         int count = 0;
         for (boolean[] row : grid) {  // grid is a 2 dimensional boolean array
             for (boolean col : row) {
-                count += col ? 1 : 0;
-            }
+                count += col ? 1 : 0; // variable x = (expression) ? value if true : value if false
+            } // ? is the ternary operator
         }
         return count;
     }
