@@ -89,14 +89,11 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         validate(row, col);
-
-        if (!isOpen(row, col)) { // if the site is blocked, it is not full
-            return false;
-        }
+        // if the site is blocked, it is not full
         // if the site is connected to the virtual top site, it is full
         // 0 is not immutable
         // there is a method in uf, called connected, which is used to check if the two sites are connected
-        return uf.find(toId(row, col)) == uf.find(0); // 0 is the virtual top
+        return isOpen(row, col) && uf.find(toId(row, col)) == uf.find(0); // 0 is the virtual top
     }
 
     // returns the number of open sites
