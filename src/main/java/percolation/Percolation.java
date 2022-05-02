@@ -100,7 +100,7 @@ public class Percolation {
     }
 
     // returns the number of open sites
-    public int numberOfOpenSites() {
+    public int numberOfOpenSites() { // there must a better way to avoid the for loop.
         int count = 0;
         for (boolean[] row : grid) {  // grid is a 2 dimensional boolean array
             for (boolean col : row) {
