@@ -4,6 +4,8 @@
 
 *所有资料和代码均来自手写或公开网站。*
 
+## 大文件git提交（放弃篇）
+
 [帮助git提交大文件](https://git-lfs.github.com/) 安装后开启
 
 `git config lfs.https://github.com/luke396/algs4.git/info/lfs.locksverify false`
