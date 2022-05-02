@@ -1,3 +1,5 @@
+package hello;
+
 public class HelloGoodbye {
     // 为了测试通过Coursera
     // 很质朴地用一系列打印来实现
