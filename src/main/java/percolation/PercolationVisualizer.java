@@ -22,6 +22,8 @@ import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.Font;
 
+// all the .txt and .png in the main/resources folder, when need to use, path is percolation/XXX.
+// because the maven is default to use the src/main/resources folder
 public class PercolationVisualizer {
 
     // delay in milliseconds (controls animation speed)
