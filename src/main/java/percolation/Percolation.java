@@ -1,4 +1,7 @@
-package percolation;
+package percolation;// when web submission, this should be removed
+// the package is  maybe because I use maven and its project structure
+// the file below main.java is all package
+// but the statement of package will not satisfy the API of the coursera.
 
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
@@ -11,6 +14,7 @@ public class Percolation {
     // Remember to see the api of what will be used, it will reduce a lot of repetition.
     private final boolean[][] grid; // true is open, false is blocked
     private final WeightedQuickUnionUF uf;
+    private int count;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -31,6 +35,7 @@ public class Percolation {
             return;
         }
         grid[row - 1][col - 1] = true; // open the site
+        count++; // count of opening site increase.
 
         int thisId = toId(row, col);
 
@@ -97,14 +102,20 @@ public class Percolation {
     }
 
     // returns the number of open sites
-    public int numberOfOpenSites() { // there must a better way to avoid the for loop.
+    public int numberOfOpenSites() {
+        // the for loop is one way,
+        // and another way is creat and change an int presenting the number of opening sites
+
+        // there must a better way to avoid the for loop.
+        /* the first method
         int count = 0;
         for (boolean[] row : grid) {  // grid is a 2 dimensional boolean array
             for (boolean col : row) {
                 count += col ? 1 : 0; // variable x = (expression) ? value if true : value if false
             } // ? is the ternary operator
         }
-        return count;
+        */
+        return count;// the second method
     }
 
     // We say the system percolates if there is a full site in the bottom row.
