@@ -13,8 +13,8 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
+    private static final int INIT_CAPACITY = 8; // TODO: seem to be changed.
     private int count;
-    private static final int INIT_CAPACITY = 8;
     private Item[] a;
 
 
@@ -62,7 +62,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private class RandomizedQueueIterator implements Iterator<Item> {
         int nextCount;
-        Item[] out = (Item[]) new Object[count]; // collect has outed
+        Item[] hasOut = (Item[]) new Object[count]; // collect has outed
 
         @Override
         public boolean hasNext() {
@@ -75,17 +75,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             boolean notFind = true;
 
             while (notFind) {
-                Item willOut = sample();
-                for (Item temp : out) {
-                    if (willOut == temp) {
-                        willOut = null;
+                Item out = sample();
+                for (Item temp : hasOut) {
+                    if (out == temp) {
+                        out = null;
                         break;
                     } else {
-                        out[nextCount++] = willOut;
-                        return willOut;
+                        hasOut[nextCount++] = out;
+                        return out;
                     }
                 }
-                if (willOut != null) notFind = false;
+                if (out != null) notFind = false;
             }
             return null;
         }
