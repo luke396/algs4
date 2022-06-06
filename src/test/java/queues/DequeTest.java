@@ -43,7 +43,12 @@ class DequeTest {
         } else {
             assertEquals(0, deque.size());
             deque.addFirst(item);
-            assertEquals(1, deque.size());
+            deque.addFirst(item);
+            deque.addFirst(item);
+            deque.addFirst(item);
+            deque.addFirst(item);
+
+            assertEquals(5, deque.size());
             assertFalse(deque.isEmpty());
         }
     }
@@ -181,6 +186,19 @@ class DequeTest {
         assertEquals("d", iterator.next());
         assertFalse(iterator.hasNext());
     }
+
+    @Test
+    @DisplayName("repeat failed tests 1")
+    void repeatFailedTest1(){
+        deque.addLast("a");
+        deque.addFirst("b");
+        deque.addFirst("c");
+        deque.addFirst("d");
+        deque.addFirst("e");
+        deque.addLast("f");
+        assertEquals(6, deque.size());
+    }
+
 
 
     @AfterEach

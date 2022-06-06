@@ -48,8 +48,8 @@ public class Deque<Item> implements Iterable<Item> {
         if (capacity < 0) throw new IllegalArgumentException("Cannot resize the capacity less than 0");
         Item[] copy = (Item[]) new Object[capacity];
         int count = size();
-        System.arraycopy(a, back + 1, copy, 0, count);
-        back = -1;
+        System.arraycopy(a, back + 1, copy, 1, count);
+        back = 0;
         front = back + 1 + count;
         a = copy;
     }
@@ -116,7 +116,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     // is need resize to smaller?
     private void isNeedBiggerSize() {
-        if (back + 1 == 0 && front - 1 == a.length) resize(a.length * 2);
+        if (back + 1 == 0 || front >= a.length) resize(a.length * 2);
     }
 
     private void isNeedSmallerSize() {

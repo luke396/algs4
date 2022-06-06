@@ -38,21 +38,36 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     // add the item
     public void enqueue(Item item) {
         if (item == null) throw new IllegalArgumentException("Enqueue item can't be null!");
+        if (count == a.length) resize(2 * a.length);
         a[count++] = item;
+    }
+
+    private void resize(int capacity) {
+        if (capacity < 0) throw new IllegalArgumentException("Cannot resize the capacity less than 0");
+        Item[] copy = (Item[]) new Object[capacity];
+        System.arraycopy(a, 0, copy, 0, count);
+        a = copy;
     }
 
     // remove and return a random item
     public Item dequeue() {
         if (isEmpty()) throw new NoSuchElementException("randomized queue is empty!");
-        int index = StdRandom.uniform(count);
+        int index = StdRandom.uniform(count--);
         Item out = a[index];
         a[index] = null;
+        updateIndex(index);
         return out;
     }
 
     // return a random item (but do not remove it)
     public Item sample() {
+        if (isEmpty()) throw new NoSuchElementException("randomized queue is empty!");
         return a[StdRandom.uniform(count)];
+    }
+
+    //update the index from discontinuous to continuous
+    private void updateIndex(int index) {
+        if (count - index >= 0) System.arraycopy(a, index + 1, a, index, count - index);
     }
 
     // return an independent iterator over items in random order
@@ -61,43 +76,47 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomizedQueueIterator implements Iterator<Item> {
-        int nextCount;
-        Item[] hasOut = (Item[]) new Object[count]; // collect has outed
+
+        Item[] forNext = a.clone(); // a copy for next().
 
         @Override
         public boolean hasNext() {
-            return nextCount != count;
+            return forNext[0] != null;
         }
 
         @Override
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException("No Next!");
-            boolean notFind = true;
+            swap(forNext, a);
+            Item out = dequeue();
+            swap(forNext, a);
+            return out;
+        }
 
-            while (notFind) {
-                Item out = sample();
-                for (Item temp : hasOut) {
-                    if (out == temp) {
-                        out = null;
-                        break;
-                    } else {
-                        hasOut[nextCount++] = out;
-                        return out;
-                    }
-                }
-                if (out != null) notFind = false;
-            }
-            return null;
+        private void swap(Item[] a, Item[] b) { // swap a and b.
+            Item[] temp = a.clone();
+            System.arraycopy(b, 0, a, 0, b.length);
+            System.arraycopy(temp, 0, b, 0, temp.length);
         }
 
         @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
     }
 
     // unit testing (required)
     public static void main(String[] args) {
+        int n = 5;
+        RandomizedQueue<Integer> queue = new RandomizedQueue<>();
+        for (int i = 0; i < n; i++)
+            queue.enqueue(i);
+        for (int a : queue) {
+            for (int b : queue)
+                StdOut.print(a + "-" + b + " ");
+            StdOut.println();
+        }
         StdOut.println("Wish me luck!");
     }
 }
