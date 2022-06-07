@@ -45,10 +45,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     // remove and return items random item
     public Item dequeue() {
         validate();
-        int index = StdRandom.uniform(size--);
+        int index = StdRandom.uniform(size);
+        // when out selected, use the last one to replace its location and remove last one.
+        // so to get the 'out' object out of the array.
         Item out = items[index];
-        items[index] = null;
-        updateIndex(index);
+        items[index] = items[--size];
+        items[size] = null;
         if (size > 0 && size == items.length >> 2) { // divide by 4
             resize(items.length >> 1); // divide by 2
         }
@@ -68,27 +70,27 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomizedQueueIterator implements Iterator<Item> {
-        private int[] randomIndexs;
+        private final int[] randomIndex;
         private int current;
 
         private RandomizedQueueIterator() {
-            randomIndexs = new int[size];
+            randomIndex = new int[size];
             for (int i = 0; i < size; i++) {
-                randomIndexs[i] = i;
+                randomIndex[i] = i;
             }
-            StdRandom.shuffle(randomIndexs);
+            StdRandom.shuffle(randomIndex);
             current = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return current != randomIndexs.length;
+            return current != randomIndex.length;
         }
 
         @Override
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException("No Next!");
-            return items[randomIndexs[current++]];
+            return items[randomIndex[current++]];
         }
 
         @Override
@@ -110,11 +112,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item[] copy = (Item[]) new Object[capacity];
         System.arraycopy(items, 0, copy, 0, size);
         items = copy;
-    }
-
-    // update the index from discontinuous to continuous
-    private void updateIndex(int index) {
-        if (size - index >= 0) System.arraycopy(items, index + 1, items, index, size - index);
     }
 
     // unit testing (required)

@@ -39,7 +39,7 @@ class DequeTest {
     void addFirst(String item) {
         if (item == null) {
             Exception addNull = assertThrows(IllegalArgumentException.class, () -> deque.addFirst(null));
-            assertEquals("Cannot add null", addNull.getMessage());
+            assertEquals("Can't add null item!", addNull.getMessage());
         } else {
             assertEquals(0, deque.size());
             deque.addFirst(item);
@@ -59,7 +59,7 @@ class DequeTest {
     void addLast(String item) {
         if (item == null) {
             Exception addNull = assertThrows(IllegalArgumentException.class, () -> deque.addLast(null));
-            assertEquals("Cannot add null", addNull.getMessage());
+            assertEquals("Can't add null item!", addNull.getMessage());
         } else {
             assertEquals(0, deque.size());
             deque.addLast(item);
@@ -125,13 +125,13 @@ class DequeTest {
         int nullCount = 0;
         if (item1 == null) {
             Exception addNull = assertThrows(IllegalArgumentException.class, () -> deque.addFirst(null));
-            assertEquals("Cannot add null", addNull.getMessage());
+            assertEquals("Can't add null item!", addNull.getMessage());
             nullCount++;
         } else deque.addFirst(item1);
 
         if (item2 == null) {
             Exception addNull = assertThrows(IllegalArgumentException.class, () -> deque.addFirst(null));
-            assertEquals("Cannot add null", addNull.getMessage());
+            assertEquals("Can't add null item!", addNull.getMessage());
             nullCount++;
         } else deque.addLast(item2);
         assertEquals(2 - nullCount, deque.size());

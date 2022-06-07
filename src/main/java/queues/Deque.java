@@ -1,145 +1,160 @@
 package queues; // the package should be removed when submitting
 
+// A double-ended queue or deque (pronounced “deck”) is a generalization of a stack and a queue
+// that supports adding and removing items from either the front or the back of the data structure.
+
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class Deque<Item> implements Iterable<Item> {
-    // The <Item> seems not obey some java rules, it should can't be named as 'Item'
-    private static final int INIT_CAPACITY = 8;
 
-    private Item[] a; // array of items
+public class Deque<Item> implements Iterable<Item> { // the linked list implementation
 
-    // front is in the rightest, and bigger than back
-    // which is the leftest, and bigger or equal to -1
-    private int front; // the location of front null
-    private int back; // the location of back null
+    private final Node head;
+    private int size;
 
-    // construct an empty deque
+    private class Node {
+
+        private Item item;
+        private Node prev;
+        private Node next;
+
+        Node(Item item) {
+            this.item = item;
+            this.prev = null;
+            this.next = null;
+        }
+
+        Node(Item item, Node prev, Node next) {
+            this.item = item;
+            this.prev = prev;
+            this.next = next;
+        }
+
+        // remove the node
+        void remove() {
+            this.prev.next = this.next;
+            this.next.prev = this.prev;
+            this.nullify();
+        }
+
+        void nullify() {
+            this.item = null;
+            this.prev = null;
+            this.next = null;
+        }
+    }
+
     public Deque() {
-        a = (Item[]) new Object[INIT_CAPACITY]; // this warning cannot avoid
-        front = INIT_CAPACITY / 2;
-        back = front - 1; // firstly, they are the same.
+        // this maybe a circular linked list
+        head = new Node(null); // head is a dummy node
+        head.next = head;
+        head.prev = head;
+        size = 0;
     }
 
-    // is the deque empty?
     public boolean isEmpty() {
-        return size() == 0;
+        return size == 0;
     }
 
-    // return the number of items on the deque
     public int size() {
-        return front - back - 1;
+        return size;
     }
 
-    // resize the underlying array holding the elements
-    private void resize(int capacity) {
-        if (capacity < 0) throw new IllegalArgumentException("Cannot resize the capacity less than 0");
-        Item[] copy = (Item[]) new Object[capacity];
-        int count = size();
-        System.arraycopy(a, back + 1, copy, 1, count);
-        back = 0;
-        front = back + 1 + count;
-        a = copy;
-    }
-
-    // add the item to the front
     public void addFirst(Item item) {
-        addIsNull(item);
-        isNeedBiggerSize();
-        a[front++] = item;
+        validate(item);
+        insert(item, head, head.next);
+        ++size;
     }
 
-    // add the item to the back
     public void addLast(Item item) {
-        addIsNull(item);
-        isNeedBiggerSize();
-        a[back--] = item;
+        validate(item);
+        insert(item, head.prev, head);
+        ++size;
     }
 
-    // remove and return the item from the front
     public Item removeFirst() {
-        if (isEmpty()) throw new NoSuchElementException("The deque is empty, cannot remove someone!");
-        Item remove = a[--front];
-        a[front] = null; // to avoid loitering
-        isNeedSmallerSize();
-        return remove;
+        validate();
+        Item item = head.next.item;
+        head.next.remove();
+        --size;
+        return item;
     }
 
-    // remove and return the item from the back
     public Item removeLast() {
-        if (isEmpty()) throw new NoSuchElementException("The deque is empty, cannot remove someone!");
-        Item remove = a[++back];
-        a[back] = null; // to avoid loitering
-        isNeedSmallerSize();
-        return remove;
+        validate();
+        Item item = head.prev.item;
+        head.prev.remove();
+        --size;
+        return item;
     }
 
-    // return an iterator over items in order from front to back
     public Iterator<Item> iterator() {
         return new DequeIterator();
     }
 
-    // an iterator, doesn't implement remove() since it's optional
     private class DequeIterator implements Iterator<Item> {
-        private int i;
 
-        public DequeIterator() {
-            i = front - 1;
-        }
+        private Node current = head.next;
 
         public boolean hasNext() {
-            return i >= back + 1;
+            return current != head;
+        }
+
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            current = current.next;
+            return current.prev.item;
         }
 
         @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
-
-        public Item next() {
-            if (!hasNext()) throw new NoSuchElementException("No Next!");
-            return a[i--];
-        }
     }
 
-    // is need resize to smaller?
-    private void isNeedBiggerSize() {
-        if (back + 1 == 0 || front >= a.length) resize(a.length * 2);
+    // add the node between prev and next
+    private void insert(Item item, Node prev, Node next) {
+        Node tmp = new Node(item, prev, next);
+        prev.next = tmp;
+        next.prev = tmp;
     }
 
-    private void isNeedSmallerSize() {
-        int count = size();
-        if (count > 0 && count < a.length / 4) resize(a.length / 2);
+    private void validate() {
+        if (isEmpty()) throw new NoSuchElementException();
     }
 
-    // if added is null
-    private void addIsNull(Item item) {
-        if (item == null) throw new IllegalArgumentException("Cannot add null");
+    private void validate(Item item) {
+        if (item == null) throw new IllegalArgumentException("Can't add null item!");
     }
 
     public static void main(String[] args) {
-        Deque<String> deque = new Deque<>();
-        deque.addFirst("a");
-        deque.addLast("b");
-        deque.addFirst("c");
-        deque.addLast("d");
-        deque.addFirst("e");
-        deque.addLast("f");
-        deque.addFirst("g");
-        deque.addLast("h");
+        Deque<Integer> deque = new Deque<>();
+        for (int i = 0; i < 10; i += 2) {
+            deque.addFirst(i);
+            deque.addLast(i + 1);
+        }
+        Iterator<Integer> it = deque.iterator();
+        while (it.hasNext()) {
+            StdOut.print(it.next() + " ");
+        }
+        StdOut.println("size: " + deque.size());
 
-        deque.removeFirst();
-        deque.removeLast();
+        for (int i = 0; i < 3; ++i) {
+            deque.removeLast();
+            deque.removeFirst();
+        }
+        it = deque.iterator();
+        while (it.hasNext()) StdOut.print(it.next() + " ");
+        StdOut.println("size: " + deque.size());
 
-        int count = deque.size();
-        if (count == 6) StdOut.println("The size is right!");
-        else StdOut.println("The size is wrong!");
-
-        for (String item : deque) StdOut.println(item);
-
-        StdOut.println("Wish me luck!");
-
+        for (int i = 0; i < 6; i += 2) {
+            deque.addLast(i);
+            deque.addFirst(i + 1);
+        }
+        it = deque.iterator();
+        while (it.hasNext()) StdOut.print(it.next() + " ");
+        StdOut.println(" size: " + deque.size());
     }
 }
