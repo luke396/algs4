@@ -6,12 +6,8 @@
 
 ## 大文件git提交（放弃篇）
 
-[帮助git提交大文件](https://git-lfs.github.com/) 安装后开启
+[帮助git提交大文件](https://git-lfs.github.com/)
 
-`git config lfs.https://github.com/luke396/algs4.git/info/lfs.locksverify false`
+references:
 
-如果是在发现无法传输大文件之后才安装调试lfs，保存好代码版本之后，删除.git目录，带着大文件重新来一遍就好了。
-
-`git config --global http.postBuffer 524288000`以调整本地仓库大小。
-
-各种尝试之后无效，我选择放弃。。。。
+[Maecenas/Algorithms-algs4-cos226-Princeton-Coursera: :100: Bonus Assignments of Algorithms 4th Edition, by Robert Sedgewick and Kevin Wayne](https://github.com/Maecenas/Algorithms-algs4-cos226-Princeton-Coursera)

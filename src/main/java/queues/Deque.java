@@ -1,15 +1,5 @@
 package queues; // the package should be removed when submitting
 
-// A double-ended queue or deque (pronounced “deck”) is a generalization of a stack and a queue
-// that supports adding and removing items from either the front or the back of the data structure.
-
-// The first problem is deciding array or list links?
-// This is based on the performance requirements.
-
-// I decide it by memory use per iterator.
-// The array based is call a[i--] to call next, maybe a constant.
-// and the list links based need 'Item item = current.item', maybe linear in num of items
-
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Iterator;

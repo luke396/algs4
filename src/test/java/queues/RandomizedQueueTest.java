@@ -71,13 +71,14 @@ class RandomizedQueueTest {
 
         Iterator<Integer> iterator = queue.iterator();
         assertTrue(iterator.hasNext());
-        assertEquals(1, iterator.next());
+        iterator.next();
         assertTrue(iterator.hasNext());
-        assertEquals(14, iterator.next());
+        iterator.next();
         assertTrue(iterator.hasNext());
-        assertEquals(31, iterator.next());
+        iterator.next();
         assertTrue(iterator.hasNext());
-        assertEquals(46, iterator.next());
+        iterator.next();
+        iterator.next();
         assertFalse(iterator.hasNext());
     }
 }

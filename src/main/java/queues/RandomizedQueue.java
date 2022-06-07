@@ -1,6 +1,6 @@
 package queues;
 
-// A randomized queue is similar to a stack or queue,
+// A randomized queue is similar to items stack or queue,
 // except that the item removed is chosen uniformly at random among items in the data structure.
 
 // This will implement by linked list, just for practice, not consider the question requirements.
@@ -13,62 +13,54 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
-    private static final int INIT_CAPACITY = 8; // TODO: seem to be changed.
-    private int count;
-    private Item[] a;
+
+    private int size;
+    private Item[] items;
 
 
     // construct an empty randomized queue
     public RandomizedQueue() {
-        a = (Item[]) new Object[INIT_CAPACITY];
-        count = 0;
+        items = (Item[]) new Object[1];
+        this.size = 0;
     }
-
 
     // is the randomized queue empty?
     public boolean isEmpty() {
-        return count == 0;
+        return size == 0;
     }
 
     // return the number of items on the randomized queue
     public int size() {
-        return count;
+        return size;
     }
 
     // add the item
     public void enqueue(Item item) {
-        if (item == null) throw new IllegalArgumentException("Enqueue item can't be null!");
-        if (count == a.length) resize(2 * a.length);
-        a[count++] = item;
+        validate(item);
+        if (size == items.length) resize(items.length << 1); // double the size
+        items[size++] = item;
     }
 
-    private void resize(int capacity) {
-        if (capacity < 0) throw new IllegalArgumentException("Cannot resize the capacity less than 0");
-        Item[] copy = (Item[]) new Object[capacity];
-        System.arraycopy(a, 0, copy, 0, count);
-        a = copy;
-    }
 
-    // remove and return a random item
+    // remove and return items random item
     public Item dequeue() {
-        if (isEmpty()) throw new NoSuchElementException("randomized queue is empty!");
-        int index = StdRandom.uniform(count--);
-        Item out = a[index];
-        a[index] = null;
+        validate();
+        int index = StdRandom.uniform(size--);
+        Item out = items[index];
+        items[index] = null;
         updateIndex(index);
+        if (size > 0 && size == items.length >> 2) { // divide by 4
+            resize(items.length >> 1); // divide by 2
+        }
         return out;
     }
 
-    // return a random item (but do not remove it)
+    // return items random item (but do not remove it)
     public Item sample() {
-        if (isEmpty()) throw new NoSuchElementException("randomized queue is empty!");
-        return a[StdRandom.uniform(count)];
+        validate();
+        return items[StdRandom.uniform(size)];
     }
 
-    //update the index from discontinuous to continuous
-    private void updateIndex(int index) {
-        if (count - index >= 0) System.arraycopy(a, index + 1, a, index, count - index);
-    }
 
     // return an independent iterator over items in random order
     public Iterator<Item> iterator() {
@@ -76,34 +68,53 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomizedQueueIterator implements Iterator<Item> {
+        private int[] randomIndexs;
+        private int current;
 
-        Item[] forNext = a.clone(); // a copy for next().
+        private RandomizedQueueIterator() {
+            randomIndexs = new int[size];
+            for (int i = 0; i < size; i++) {
+                randomIndexs[i] = i;
+            }
+            StdRandom.shuffle(randomIndexs);
+            current = 0;
+        }
 
         @Override
         public boolean hasNext() {
-            return forNext[0] != null;
+            return current != randomIndexs.length;
         }
 
         @Override
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException("No Next!");
-            swap(forNext, a);
-            Item out = dequeue();
-            swap(forNext, a);
-            return out;
-        }
-
-        private void swap(Item[] a, Item[] b) { // swap a and b.
-            Item[] temp = a.clone();
-            System.arraycopy(b, 0, a, 0, b.length);
-            System.arraycopy(temp, 0, b, 0, temp.length);
+            return items[randomIndexs[current++]];
         }
 
         @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
+    }
 
+    private void validate() {
+        if (isEmpty()) throw new NoSuchElementException("randomized queue is empty!");
+    }
+
+    private void validate(Item item) {
+        if (item == null) throw new IllegalArgumentException("Enqueue item can't be null!");
+    }
+
+    private void resize(int capacity) {
+        assert capacity >= size;
+        Item[] copy = (Item[]) new Object[capacity];
+        System.arraycopy(items, 0, copy, 0, size);
+        items = copy;
+    }
+
+    // update the index from discontinuous to continuous
+    private void updateIndex(int index) {
+        if (size - index >= 0) System.arraycopy(items, index + 1, items, index, size - index);
     }
 
     // unit testing (required)
