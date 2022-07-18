@@ -18,7 +18,7 @@ public class BruteCollinearPoints {
 
     public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
         valid(points);
-        Arrays.sort(points); // sort by x_label
+        Arrays.sort(points);
         Queue<Point[]> combinationsOf4 = combinationsOf4(points);
         Point p;
         Point q;
@@ -33,10 +33,15 @@ public class BruteCollinearPoints {
             if (isCollinear(p, q, r, s)) {
                 addCollinearPoints(p, q, r, s);
             }
-        }// 这里之所以要拆分的这么零碎，主要是为了降低阅读的复杂度。
+        } // 这里之所以要拆分的这么零碎，主要是为了降低阅读的复杂度。
     }
 
     private void valid(Point[] points) {
+        for (Point point : points) {
+            if (point == null) {
+                throw new IllegalArgumentException("Input point can't be null!");
+            }
+        }
         for (int i = 0; i < points.length; i++) {
             for (int j = i + 1; j < points.length; j++) {
                 valid(points[i], points[j]);
@@ -44,11 +49,9 @@ public class BruteCollinearPoints {
         }
     }
 
-    // is points repetition or null?
+
+    // is points repetition ?
     private void valid(Point a, Point b) {
-        if (a == null || b == null) {
-            throw new IllegalArgumentException("Input point can't be null!");
-        }
         if (a.slopeTo(b) == Double.NEGATIVE_INFINITY) {
             throw new IllegalArgumentException("Input point can't repeat.");
         }
@@ -112,25 +115,31 @@ public class BruteCollinearPoints {
 
     public LineSegment[] segments() {                // the line segments
         LineSegment[] segments = new LineSegment[numOfSegments];
-        int i = 0;
-        while (!collinearPoints.isEmpty()) {
-            Point[] collinear = collinearPoints.dequeue();
-            LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
-            if (!isIn(segments, segment)) {
-                segments[i] = segment;
-                i++;
+        Point[][] pointsIn = new Point[numOfSegments][];
+        int index = 0; // this is for controlling element in
+        for (Point[] collinear : collinearPoints) {
+            if (collinear[0] != null && collinear[1] != null) {
+                Point[] pointsWill = new Point[2]; // will create segment
+                pointsWill[0] = collinear[0];
+                pointsWill[1] = collinear[collinear.length - 1];
+                boolean hasIn = false;
+                for (Point[] pointIn : pointsIn) { // to see this segments has change to segment or not
+                    if (pointIn != null && (pointIn[0] == pointsWill[0] && pointIn[1] == pointsWill[1])) {
+                        hasIn = true;
+                        break;
+                    }
+                }
+                if (!hasIn) {
+                    LineSegment segment = new LineSegment(pointsWill[0], pointsWill[1]);
+                    segments[index] = segment;
+                    pointsIn[index] = pointsWill;
+                    index++;
+                }
             }
         }
         return segments;
     }
 
-    // is it already in? (to reduce repetition)
-    private static boolean isIn(LineSegment[] segments, LineSegment willIn) {
-        for (LineSegment segment : segments) {
-            if (segment != null && segment.toString().equals(willIn.toString())) return true;
-        }
-        return false;
-    }
 
     public static void main(String[] args) {
         Point p1 = new Point(1, 1);
