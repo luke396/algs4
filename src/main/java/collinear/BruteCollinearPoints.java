@@ -1,4 +1,4 @@
-// package collinear;
+package collinear;
 
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
@@ -18,8 +18,8 @@ public class BruteCollinearPoints {
 
     public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
         valid(points);
-        // 规范提示用while替换for，但是我觉得for的可读性比while更好，不知道是不受我的偏见
         int pIndex = 0;
+        Arrays.sort(points); // sort by x_label
         while (pIndex < points.length) {
             Point p = points[pIndex];
             int qIndex = pIndex + 1;
@@ -86,8 +86,6 @@ public class BruteCollinearPoints {
         LineSegment[] segments = new LineSegment[numOfSegments];
         for (int i = 0; i < numOfSegments; i++) {
             Point[] collinear = collinearPoints.dequeue();
-            // sort with x_label
-            Arrays.sort(collinear);
             LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
             if (!isIn(segments, segment)) {
                 segments[i] = segment;
@@ -115,6 +113,9 @@ public class BruteCollinearPoints {
         Point[] points;
         points = new Point[]{p1, p2, p3, p4, p5, p6, p7};
         BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (Point point : points) {
+            StdOut.println(point.toString());
+        }
         StdOut.println("# of segments is:");
         StdOut.println(collinear.numOfSegments);
         LineSegment[] segments = collinear.segments();

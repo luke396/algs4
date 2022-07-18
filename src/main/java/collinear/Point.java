@@ -1,4 +1,4 @@
-// package collinear;
+package collinear;
 
 
 import edu.princeton.cs.algs4.StdDraw;
