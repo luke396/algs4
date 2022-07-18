@@ -122,7 +122,7 @@ public class Point implements Comparable<Point> {
 
     /**
      * Returns a string representation of this point.
-     * This method is provide for debugging;
+     * This method is provided for debugging;
      * your program should not rely on the format of the string representation.
      *
      * @return a string representation of this point
