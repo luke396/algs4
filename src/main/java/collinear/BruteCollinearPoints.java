@@ -18,36 +18,21 @@ public class BruteCollinearPoints {
 
     public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
         valid(points);
-        int pIndex = 0;
         Arrays.sort(points); // sort by x_label
-        while (pIndex < points.length) {
-            Point p = points[pIndex];
-            int qIndex = pIndex + 1;
-            while (qIndex < points.length) {
-                Point q = points[qIndex];
-                int rIndex = qIndex + 1;
-                while (rIndex < points.length) {
-                    Point r = points[rIndex];
-                    int sIndex = rIndex + 1;
-                    if (!isCollinear(p, q, r)) { // if three points is not collinear, the four is not matter
-                        break;
-                    } else {
-                        while (sIndex < points.length) {
-                            Point s = points[sIndex];
-                            if (isCollinear(p, q, r, s)) {
-                                Point[] collinear;
-                                collinear = new Point[]{p, q, r, s};
-                                collinearPoints.enqueue(collinear);
-                                numOfSegments += 1;
-                            }
-                            sIndex++;
-                        }
-                    }
-                    rIndex++;
-                }
-                qIndex++;
+        Queue<Point[]> combinationsOf4 = combinationsOf4(points);
+        Point p;
+        Point q;
+        Point r;
+        Point s;
+        while (!combinationsOf4.isEmpty()) {
+            Point[] combination = combinationsOf4.dequeue();
+            p = combination[0];
+            q = combination[1];
+            r = combination[2];
+            s = combination[3];
+            if (isCollinear(p, q, r, s)) {
+                addCollinearPoints(p, q, r, s);
             }
-            pIndex++;
         }
     }
 
@@ -69,12 +54,55 @@ public class BruteCollinearPoints {
         }
     }
 
+    // find all collinear combinations of 4 from points
+    private Queue<Point[]> combinationsOf4(Point[] points) {
+        Queue<Point[]> combinationsOf4 = new Queue<>();
+        int pIndex = 0;
+        while (pIndex < points.length) {
+            int qIndex = pIndex + 1;
+            while (qIndex < points.length) {
+                int rIndex = qIndex + 1;
+                while (rIndex < points.length) {
+                    Point p = points[pIndex];
+                    Point q = points[qIndex];
+                    Point r = points[rIndex];
+                    // if three points is not collinear, the four is not matter
+                    if (isCollinear(p, q, r)) {
+                        int sIndex = rIndex + 1;
+                        while (sIndex < points.length) {
+                            Point s = points[sIndex];
+                            Point[] combination = new Point[4];
+                            combination[0] = p;
+                            combination[1] = q;
+                            combination[2] = r;
+                            combination[3] = s;
+                            combinationsOf4.enqueue(combination);
+                            sIndex++;
+                        }
+                    }
+                    rIndex++;
+                }
+                qIndex++;
+            }
+            pIndex++;
+        }
+        return combinationsOf4;
+    }
+
     private boolean isCollinear(Point p, Point q, Point r) { // is three points collinear?
         return (p.slopeTo(q) == p.slopeTo(r));
     }
 
     private boolean isCollinear(Point p, Point q, Point r, Point s) { // is four points collinear?
         return (p.slopeTo(q) == p.slopeTo(r)) && (p.slopeTo(r) == p.slopeTo(s) && (p.slopeTo(q) == p.slopeTo(s)));
+    }
+
+    // add unrepeated collinear to collinearPoints.
+    private void addCollinearPoints(Point p, Point q, Point r, Point s) {
+        Point[] collinear;
+        collinear = new Point[]{p, q, r, s};
+        collinearPoints.enqueue(collinear);
+        numOfSegments += 1;
     }
 
     public int numberOfSegments()        // the number of line segments
@@ -84,11 +112,13 @@ public class BruteCollinearPoints {
 
     public LineSegment[] segments() {                // the line segments
         LineSegment[] segments = new LineSegment[numOfSegments];
-        for (int i = 0; i < numOfSegments; i++) {
+        int i = 0;
+        while (!collinearPoints.isEmpty()) {
             Point[] collinear = collinearPoints.dequeue();
             LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
             if (!isIn(segments, segment)) {
                 segments[i] = segment;
+                i++;
             }
         }
         return segments;
@@ -118,10 +148,10 @@ public class BruteCollinearPoints {
         }
         StdOut.println("# of segments is:");
         StdOut.println(collinear.numOfSegments);
+        StdOut.println("Segments finally is:");
         LineSegment[] segments = collinear.segments();
         for (LineSegment segment : segments) {
             if (segment != null) {
-                segment.draw();
                 StdOut.println(segment.toString());
             }
         }
