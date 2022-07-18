@@ -33,7 +33,7 @@ public class BruteCollinearPoints {
             if (isCollinear(p, q, r, s)) {
                 addCollinearPoints(p, q, r, s);
             }
-        }
+        }// 这里之所以要拆分的这么零碎，主要是为了降低阅读的复杂度。
     }
 
     private void valid(Point[] points) {
