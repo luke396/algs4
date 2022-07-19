@@ -17,9 +17,12 @@ public class BruteCollinearPoints {
     private final Queue<Point[]> collinearPoints = new Queue<>();
 
     public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
+        // to avoid java.lang.NullPointerException
+        if (points == null) throw new IllegalArgumentException("Input point can't be null!");
         valid(points);
-        Arrays.sort(points);
-        Queue<Point[]> combinationsOf4 = combinationsOf4(points);
+        Point[] pointsSorted = Arrays.copyOf(points, points.length); // to avoid mutate original array
+        Arrays.sort(pointsSorted);
+        Queue<Point[]> combinationsOf4 = combinationsOf4(pointsSorted);
         Point p;
         Point q;
         Point r;
@@ -33,10 +36,11 @@ public class BruteCollinearPoints {
             if (isCollinear(p, q, r, s)) {
                 addCollinearPoints(p, q, r, s);
             }
-        } // 这里之所以要拆分的这么零碎，主要是为了降低阅读的复杂度。
+        }
     }
 
     private void valid(Point[] points) {
+
         for (Point point : points) {
             if (point == null) {
                 throw new IllegalArgumentException("Input point can't be null!");
@@ -115,7 +119,7 @@ public class BruteCollinearPoints {
 
     public LineSegment[] segments() {                // the line segments
         LineSegment[] segments = new LineSegment[numOfSegments];
-        Point[][] pointsIn = new Point[numOfSegments][];
+        Point[][] pointsIn = new Point[numOfSegments][]; // to reduce repetition
         int index = 0; // this is for controlling element in
         for (Point[] collinear : collinearPoints) {
             if (collinear[0] != null && collinear[1] != null) {
@@ -160,6 +164,16 @@ public class BruteCollinearPoints {
         StdOut.println("Segments finally is:");
         LineSegment[] segments = collinear.segments();
         for (LineSegment segment : segments) {
+            if (segment != null) {
+                StdOut.println(segment.toString());
+            }
+        }
+        StdOut.println("Once again!");
+        StdOut.println("# of segments is:");
+        StdOut.println(collinear.numOfSegments);
+        StdOut.println("Segments finally is:");
+        LineSegment[] segments2 = collinear.segments();
+        for (var segment : segments2) {
             if (segment != null) {
                 StdOut.println(segment.toString());
             }
