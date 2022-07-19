@@ -54,22 +54,17 @@ public class FastCollinearPoints {
     private void addCollinearOfPoint(Point[] points, Point p) {
         for (int i = 1; i < points.length; i++) { // 0 is the p
             int numOfSameSlope = 0;
-            boolean hasIndex = true;
-            boolean hasSameSlope = true;
-            while (hasIndex && hasSameSlope) {
-                hasIndex = i + numOfSameSlope + 1 < points.length;
-                hasSameSlope = p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1]);
+            while (i + numOfSameSlope + 1 < points.length && p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1])) {
                 numOfSameSlope += 1;
-            }
-
-            if (numOfSameSlope >= 4) {
-                // to include point p
-                Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope);
-                if (i - 1 != 0) {
-                    collinear[0] = p;
+                if (numOfSameSlope >= 3) {
+                    // to include point p
+                    Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope);
+                    if (i - 1 != 0) {
+                        collinear[0] = p;
+                    }
+                    collinearPoints.enqueue(collinear);
+                    numOfSegment += 1;
                 }
-                collinearPoints.enqueue(collinear);
-                numOfSegment += 1;
             }
         }
     }
