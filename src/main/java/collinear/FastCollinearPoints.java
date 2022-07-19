@@ -7,19 +7,21 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Arrays;
 
 /**
- * Created by Luke on 2022/7/16 15:20
+ * @author luke
+ *
  *
  * <p>
- * Changed by luke on 13:52
+ * Changed by luke on 2022/7/19, 19:48.
  */
-
 
 public class FastCollinearPoints {
     private final Queue<Point[]> collinearPoints = new Queue<>();
     private int numOfSegment;
 
     public FastCollinearPoints(Point[] points) {     // finds all line segments containing 4 or more points
-        if (points == null) throw new IllegalArgumentException("Input point can't be null!");
+        if (points == null) {
+            throw new IllegalArgumentException("Input point can't be null!");
+        }
         valid(points);
         Arrays.sort(points);
         for (int i = 0; i < points.length; i++) {
@@ -47,16 +49,20 @@ public class FastCollinearPoints {
         }
     }
 
-    // find and enqueue all combination of collinear with p
+    /**
+     * find and enqueue all combination of collinear with p
+     */
     private void addCollinearOfPoint(Point[] points, Point p) {
-        for (int i = 0; i < points.length; i++) { // 0 is the p
+        // 0 is the p
+        for (int i = 0; i < points.length; i++) {
             int numOfSameSlope = 0;
             while (i + numOfSameSlope + 1 < points.length && p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1])) {
                 numOfSameSlope += 1;
             }
             if (numOfSameSlope >= 2) {
                 Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope + 1);
-                collinear[0] = p; // to include point p
+                // to include point p
+                collinear[0] = p;
                 collinearPoints.enqueue(collinear);
                 numOfSegment += 1;
             }
