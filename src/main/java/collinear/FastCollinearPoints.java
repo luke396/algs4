@@ -10,11 +10,9 @@ import java.util.Comparator;
 
 /**
  * Created by Luke on 2022/7/16 15:20
-
-  *<p>
-  *Changed by luke on 23:18
-  *
-  
+ *
+ * <p>
+ * Changed by luke on 13:52
  */
 
 
@@ -23,44 +21,53 @@ public class FastCollinearPoints {
     private int numOfSegment;
 
     public FastCollinearPoints(Point[] points) {     // finds all line segments containing 4 or more points
+        if (points == null) throw new IllegalArgumentException("Input point can't be null!");
         valid(points);
+
         for (int i = 0; i < points.length; i++) {
             Point p = points[i];
             Comparator<Point> slopeOrder = p.slopeOrder();
-            Point[] lefts = Arrays.copyOfRange(points, i + 1, points.length);
+            Point[] lefts = Arrays.copyOfRange(points, i, points.length); // "i" is the point p
             Arrays.sort(lefts, slopeOrder);
             addCollinearOfPoint(lefts, p);
         }
     }
 
-
     private void valid(Point[] points) {
-        for (int i = 0; i < points.length; i++) {
-            for (int j = i + 1; j < points.length; j++) {
-                valid(points[i], points[j]);
+        for (Point point : points) {
+            if (point == null) {
+                throw new IllegalArgumentException("Input point can't be null!");
             }
         }
-    }
-
-    // is points repetition or null?
-    private void valid(Point a, Point b) {
-        if (a == null || b == null) {
-            throw new IllegalArgumentException("Input point can't be null!");
-        }
-        if (a.slopeTo(b) == Double.NEGATIVE_INFINITY) { // if a and b are same
-            throw new IllegalArgumentException("Input point can't repeat.");
+        for (int i = 0; i < points.length; i++) {
+            for (int j = i + 1; j < points.length; j++) {
+                Point a = points[i];
+                Point b = points[j];
+                if (a.slopeTo(b) == Double.NEGATIVE_INFINITY) {
+                    throw new IllegalArgumentException("Input point can't repeat.");
+                }
+            }
         }
     }
 
     // find and enqueue all combination of collinear with p
     private void addCollinearOfPoint(Point[] points, Point p) {
-        for (int i = 0; i < points.length; i++) {
+        for (int i = 1; i < points.length; i++) { // 0 is the p
             int numOfSameSlope = 0;
-            while (p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1])) {
+            boolean hasIndex = true;
+            boolean hasSameSlope = true;
+            while (hasIndex && hasSameSlope) {
+                hasIndex = i + numOfSameSlope + 1 < points.length;
+                hasSameSlope = p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1]);
                 numOfSameSlope += 1;
             }
+
             if (numOfSameSlope >= 4) {
-                Point[] collinear = Arrays.copyOfRange(points, i, i + numOfSameSlope);
+                // to include point p
+                Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope);
+                if (i - 1 != 0) {
+                    collinear[0] = p;
+                }
                 collinearPoints.enqueue(collinear);
                 numOfSegment += 1;
             }
@@ -74,8 +81,7 @@ public class FastCollinearPoints {
     public LineSegment[] segments() {               // the line segments
         LineSegment[] segments = new LineSegment[numOfSegment];
         int num = 0;
-        while (!collinearPoints.isEmpty()) {
-            Point[] collinear = collinearPoints.dequeue();
+        for (Point[] collinear : collinearPoints) {
             LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
             if (!isIn(segments, segment)) {
                 segments[num] = segment;
@@ -87,7 +93,7 @@ public class FastCollinearPoints {
 
     private static boolean isIn(LineSegment[] segments, LineSegment willIn) {
         for (LineSegment segment : segments) {
-            if (segment != null && segment.toString().equals(willIn.toString())) return true;
+            if (segment != null && segment.equals(willIn)) return true;
         }
         return false;
     }
