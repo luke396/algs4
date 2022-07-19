@@ -1,5 +1,6 @@
 package collinear;
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -7,6 +8,8 @@ import java.util.Arrays;
 
 /**
  * @author luke
+ * <p>
+ * Changed by luke on 15:15
  */
 public class BruteCollinearPoints {
     private int numOfSegments;
@@ -146,37 +149,20 @@ public class BruteCollinearPoints {
 
 
     public static void main(String[] args) {
-        Point p1 = new Point(1, 1);
-        Point p2 = new Point(3, 3);
-        Point p3 = new Point(4, 4);
-        Point p4 = new Point(7, 7);
-        Point p5 = new Point(6, 5);
-        Point p6 = new Point(5, 5);
-        Point p7 = new Point(7, 5);
-        Point[] points;
-        points = new Point[]{p1, p2, p3, p4, p5, p6, p7};
+
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+        // print and draw the line segments
         BruteCollinearPoints collinear = new BruteCollinearPoints(points);
-        for (Point point : points) {
-            StdOut.println(point.toString());
-        }
-        StdOut.println("# of segments is:");
-        StdOut.println(collinear.numOfSegments);
-        StdOut.println("Segments finally is:");
-        LineSegment[] segments = collinear.segments();
-        for (LineSegment segment : segments) {
-            if (segment != null) {
-                StdOut.println(segment.toString());
-            }
-        }
-        StdOut.println("Once again!");
-        StdOut.println("# of segments is:");
-        StdOut.println(collinear.numOfSegments);
-        StdOut.println("Segments finally is:");
-        LineSegment[] segments2 = collinear.segments();
-        for (var segment : segments2) {
-            if (segment != null) {
-                StdOut.println(segment.toString());
-            }
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
         }
     }
 }

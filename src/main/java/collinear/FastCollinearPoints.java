@@ -2,11 +2,9 @@ package collinear;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Queue;
-import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Created by Luke on 2022/7/16 15:20
@@ -23,12 +21,11 @@ public class FastCollinearPoints {
     public FastCollinearPoints(Point[] points) {     // finds all line segments containing 4 or more points
         if (points == null) throw new IllegalArgumentException("Input point can't be null!");
         valid(points);
-
+        Arrays.sort(points);
         for (int i = 0; i < points.length; i++) {
             Point p = points[i];
-            Comparator<Point> slopeOrder = p.slopeOrder();
-            Point[] lefts = Arrays.copyOfRange(points, i, points.length); // "i" is the point p
-            Arrays.sort(lefts, slopeOrder);
+            Point[] lefts = Arrays.copyOfRange(points, i, points.length);
+            Arrays.sort(lefts, p.slopeOrder());
             addCollinearOfPoint(lefts, p);
         }
     }
@@ -52,19 +49,16 @@ public class FastCollinearPoints {
 
     // find and enqueue all combination of collinear with p
     private void addCollinearOfPoint(Point[] points, Point p) {
-        for (int i = 1; i < points.length; i++) { // 0 is the p
+        for (int i = 0; i < points.length; i++) { // 0 is the p
             int numOfSameSlope = 0;
             while (i + numOfSameSlope + 1 < points.length && p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1])) {
                 numOfSameSlope += 1;
-                if (numOfSameSlope >= 3) {
-                    // to include point p
-                    Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope);
-                    if (i - 1 != 0) {
-                        collinear[0] = p;
-                    }
-                    collinearPoints.enqueue(collinear);
-                    numOfSegment += 1;
-                }
+            }
+            if (numOfSameSlope >= 2) {
+                Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope + 1);
+                collinear[0] = p; // to include point p
+                collinearPoints.enqueue(collinear);
+                numOfSegment += 1;
             }
         }
     }
@@ -78,20 +72,12 @@ public class FastCollinearPoints {
         int num = 0;
         for (Point[] collinear : collinearPoints) {
             LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
-            if (!isIn(segments, segment)) {
-                segments[num] = segment;
-                num++;
-            }
+            segments[num] = segment;
+            num++;
         }
         return segments;
     }
 
-    private static boolean isIn(LineSegment[] segments, LineSegment willIn) {
-        for (LineSegment segment : segments) {
-            if (segment != null && segment.equals(willIn)) return true;
-        }
-        return false;
-    }
 
     public static void main(String[] args) {
 
@@ -104,23 +90,11 @@ public class FastCollinearPoints {
             int y = in.readInt();
             points[i] = new Point(x, y);
         }
-
-        // draw the points
-        StdDraw.enableDoubleBuffering();
-        StdDraw.setXscale(0, 32768);
-        StdDraw.setYscale(0, 32768);
-        for (Point p : points) {
-            p.draw();
-        }
-        StdDraw.show();
-
         // print and draw the line segments
         FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
-            segment.draw();
         }
-        StdDraw.show();
     }
 }
 
