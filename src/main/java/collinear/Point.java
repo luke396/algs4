@@ -4,6 +4,7 @@ package collinear;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -68,7 +69,7 @@ public class Point implements Comparable<Point> {
         if (this.x == that.x && this.y == that.y) {
             slope = Double.NEGATIVE_INFINITY;
         } else if (this.x != that.x && this.y == that.y) {
-            slope = 0;
+            slope = 0.0;
         } else if (this.x == that.x) {
             slope = Double.POSITIVE_INFINITY;
         } else {
@@ -107,17 +108,12 @@ public class Point implements Comparable<Point> {
      *
      * @return the Comparator that defines this ordering on points
      */
+
     public Comparator<Point> slopeOrder() {
-        class SlopeOrder implements Comparator<Point> {
-            @Override
-            // It is worth noting that the comparison here is between result of slopeTo (point with specific point)
-            public int compare(Point q1, Point q2) {
-                double res1 = slopeTo(q1);
-                double res2 = slopeTo(q2);
-                return Double.compare(res1, res2);
-            }
-        }
-        return new SlopeOrder();
+        return Comparator.comparingDouble(this::slopeTo);
+        // lambda expression for short implement
+        // reference:
+        // https://stackoverflow.com/questions/20001427/double-colon-operator-in-java-8
     }
 
     /**
@@ -136,24 +132,23 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        Point p1 = new Point(100, 1500);
-        Point p2 = new Point(100, 3);
-        Point p3 = new Point(3, 5);
+        /* YOUR CODE HERE */
+        Point[] p = new Point[10];
+        // ++i and i++ when use in loop like this, there is no difference.
+        for (int i = 0; i < 10; ++i) {
+            p[i] = new Point(i, i * i - 10 * i + 25);
+        }
+        for (int i = 0; i < 9; ++i) {
+            StdOut.println(p[i].slopeTo(new Point(0, i * i)));
+        }
 
-        // 不知道为什么画不出来
-        StdDraw.enableDoubleBuffering();
-        StdDraw.setXscale(0, 32768);
-        StdDraw.setYscale(0, 32768);
-        p1.draw();
-        p1.drawTo(p2);
-        p1.drawTo(p3);
-        p2.drawTo(p3);
-        StdDraw.show();
-
-        double slope = p1.slopeTo(p2);
-        int compare = p1.compareTo(p2);
-        StdOut.println("Starting!");
-        StdOut.println(slope);
-        StdOut.println(compare);
+        for (int i = 0; i < 10; ++i) {
+            StdOut.println(p[i]);
+        }
+        StdOut.println();
+        Arrays.sort(p, p[5].slopeOrder());
+        for (int i = 0; i < 10; ++i) {
+            StdOut.println(p[i]);
+        }
     }
 }

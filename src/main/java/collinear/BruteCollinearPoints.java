@@ -1,50 +1,58 @@
 package collinear;
 
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+
 
 /**
  * @author luke
  */
 public class BruteCollinearPoints {
-    private int numOfSegments;
 
     /**
      * combination of four points
      */
-    private final Queue<Point[]> collinearPoints = new Queue<>();
 
-    public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
-        // to avoid java.lang.NullPointerException
-        if (points == null) {
-            throw new IllegalArgumentException("Input point can't be null!");
-        }
+    private final ArrayList<LineSegment> lineSegments = new ArrayList<>();
+
+    /**
+     * finds all line segments containing 4 points
+     */
+    public BruteCollinearPoints(Point[] points) {
         valid(points);
-        // to avoid mutate original array
-        Point[] pointsSorted = Arrays.copyOf(points, points.length);
-        Arrays.sort(pointsSorted);
-        Queue<Point[]> combinationsOf4 = combinationsOf4(pointsSorted);
-        Point p;
-        Point q;
-        Point r;
-        Point s;
-        while (!combinationsOf4.isEmpty()) {
-            Point[] combination = combinationsOf4.dequeue();
-            p = combination[0];
-            q = combination[1];
-            r = combination[2];
-            s = combination[3];
-            if (isCollinear(p, q, r, s)) {
-                addCollinearPoints(p, q, r, s);
+        for (int i = 0; i < points.length - 3; i++) {
+            for (int j = i + 1; j < points.length - 2; j++) {
+                for (int k = j + 1; k < points.length - 1; k++) {
+                    Point p = points[i];
+                    Point q = points[j];
+                    Point r = points[k];
+                    // if three points are not collinear, the forth is no matter
+                    // so continue to change r.
+                    // if "break", it will change q, ignore "r" left points.
+                    if (!isCollinear(p, q, r)) {
+                        continue;
+                    }
+                    for (int m = k + 1; m < points.length; m++) {
+                        Point s = points[m];
+                        if (isCollinear(p, q, r, s)) {
+                            Point[] segment = new Point[]{p, q, r, s};
+                            Arrays.sort(segment);
+                            lineSegments.add(new LineSegment(segment[0], segment[3]));
+                        }
+                    }
+                }
             }
         }
     }
 
     private void valid(Point[] points) {
-
+        // to avoid java.lang.NullPointerException
+        if (points == null) {
+            throw new IllegalArgumentException("Input point can't be null!");
+        }
         for (Point point : points) {
             if (point == null) {
                 throw new IllegalArgumentException("Input point can't be null!");
@@ -52,108 +60,45 @@ public class BruteCollinearPoints {
         }
         for (int i = 0; i < points.length; i++) {
             for (int j = i + 1; j < points.length; j++) {
-                valid(points[i], points[j]);
-            }
-        }
-    }
-
-
-    /**
-     * is points repetition ?
-     */
-    private void valid(Point a, Point b) {
-        if (a.slopeTo(b) == Double.NEGATIVE_INFINITY) {
-            throw new IllegalArgumentException("Input point can't repeat.");
-        }
-    }
-
-    /**
-     * find all collinear combinations of 4 from points
-     */
-    private Queue<Point[]> combinationsOf4(Point[] points) {
-        Queue<Point[]> combinationsOf4 = new Queue<>();
-        int pIndex = 0;
-        while (pIndex < points.length) {
-            int qIndex = pIndex + 1;
-            while (qIndex < points.length) {
-                int rIndex = qIndex + 1;
-                while (rIndex < points.length) {
-                    Point p = points[pIndex];
-                    Point q = points[qIndex];
-                    Point r = points[rIndex];
-                    // if three points is not collinear, the four is not matter
-                    if (isCollinear(p, q, r)) {
-                        int sIndex = rIndex + 1;
-                        while (sIndex < points.length) {
-                            Point s = points[sIndex];
-                            Point[] combination = new Point[4];
-                            combination[0] = p;
-                            combination[1] = q;
-                            combination[2] = r;
-                            combination[3] = s;
-                            combinationsOf4.enqueue(combination);
-                            sIndex++;
-                        }
-                    }
-                    rIndex++;
+                // equal is the easiest way to test tow value same or not.
+                // diff between "==":
+                // https://stackoverflow.com/questions/7520432/what-is-the-difference-between-and-equals-in-java
+                if (points[i].equals(points[j])) {
+                    throw new IllegalArgumentException("Input point can't repeat.");
                 }
-                qIndex++;
             }
-            pIndex++;
         }
-        return combinationsOf4;
     }
 
-    private boolean isCollinear(Point p, Point q, Point r) { // is three points collinear?
+
+    /**
+     * is three points collinear?
+     */
+    private boolean isCollinear(Point p, Point q, Point r) {
         return (p.slopeTo(q) == p.slopeTo(r));
     }
 
-    private boolean isCollinear(Point p, Point q, Point r, Point s) { // is four points collinear?
-        return (p.slopeTo(q) == p.slopeTo(r)) && (p.slopeTo(r) == p.slopeTo(s) && (p.slopeTo(q) == p.slopeTo(s)));
+    /**
+     * is four points collinear?
+     */
+    private boolean isCollinear(Point p, Point q, Point r, Point s) {
+        return (p.slopeTo(q) == p.slopeTo(r)) && (p.slopeTo(r) == p.slopeTo(s));
     }
 
-    // add unrepeated collinear to collinearPoints.
-    private void addCollinearPoints(Point p, Point q, Point r, Point s) {
-        Point[] collinear;
-        collinear = new Point[]{p, q, r, s};
-        collinearPoints.enqueue(collinear);
-        numOfSegments += 1;
+
+    /**
+     * the number of line segments
+     */
+    public int numberOfSegments() {
+        return lineSegments.size();
     }
 
-    public int numberOfSegments()        // the number of line segments
-    {
-        return numOfSegments;
-    }
 
-    public LineSegment[] segments() {                // the line segments
-        LineSegment[] segments = new LineSegment[numOfSegments];
-        // to reduce repetition
-        Point[][] pointsIn = new Point[numOfSegments][];
-        // this is for controlling element in
-        int index = 0;
-        for (Point[] collinear : collinearPoints) {
-            if (collinear[0] != null && collinear[1] != null) {
-                // will create segment
-                Point[] pointsWill = new Point[2];
-                pointsWill[0] = collinear[0];
-                pointsWill[1] = collinear[collinear.length - 1];
-                boolean hasIn = false;
-                // to see this segments has change to segment or not
-                for (Point[] pointIn : pointsIn) {
-                    if (pointIn != null && (pointIn[0] == pointsWill[0] && pointIn[1] == pointsWill[1])) {
-                        hasIn = true;
-                        break;
-                    }
-                }
-                if (!hasIn) {
-                    LineSegment segment = new LineSegment(pointsWill[0], pointsWill[1]);
-                    segments[index] = segment;
-                    pointsIn[index] = pointsWill;
-                    index++;
-                }
-            }
-        }
-        return segments;
+    /**
+     * the line segments
+     */
+    public LineSegment[] segments() {
+        return lineSegments.toArray(new LineSegment[numberOfSegments()]);
     }
 
 
