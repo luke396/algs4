@@ -1,38 +1,39 @@
 package collinear;
 
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * @author luke
- *
- *
- * <p>
- * Changed by luke on 2022/7/19, 19:48.
  */
 
 public class FastCollinearPoints {
-    private final Queue<Point[]> collinearPoints = new Queue<>();
-    private int numOfSegment;
+    private final ArrayList<LineSegment> lineSegments = new ArrayList<>();
+    private final ArrayList<Point[]> collinearPoints = new ArrayList<>();
 
-    public FastCollinearPoints(Point[] points) {     // finds all line segments containing 4 or more points
-        if (points == null) {
-            throw new IllegalArgumentException("Input point can't be null!");
-        }
+    /**
+     * finds all line segments containing 4 or more points
+     */
+    public FastCollinearPoints(Point[] points) {
         valid(points);
-        Arrays.sort(points);
-        for (int i = 0; i < points.length; i++) {
-            Point p = points[i];
-            Point[] lefts = Arrays.copyOfRange(points, i, points.length);
+        Point[] pointsSorted = points.clone();
+        for (int i = 0; i < pointsSorted.length; i++) {
+            Point p = pointsSorted[i];
+            // lefts not contain "p"
+            Point[] lefts = Arrays.copyOfRange(pointsSorted, i + 1, pointsSorted.length);
             Arrays.sort(lefts, p.slopeOrder());
             addCollinearOfPoint(lefts, p);
         }
     }
 
+
     private void valid(Point[] points) {
+        if (points == null) {
+            throw new IllegalArgumentException("Input point can't be null!");
+        }
         for (Point point : points) {
             if (point == null) {
                 throw new IllegalArgumentException("Input point can't be null!");
@@ -40,48 +41,83 @@ public class FastCollinearPoints {
         }
         for (int i = 0; i < points.length; i++) {
             for (int j = i + 1; j < points.length; j++) {
-                Point a = points[i];
-                Point b = points[j];
-                if (a.slopeTo(b) == Double.NEGATIVE_INFINITY) {
+                if (points[i].equals(points[j])) {
                     throw new IllegalArgumentException("Input point can't repeat.");
                 }
             }
         }
     }
 
-    /**
-     * find and enqueue all combination of collinear with p
-     */
     private void addCollinearOfPoint(Point[] points, Point p) {
-        // 0 is the p
+        Point used = new Point(-1, -1);
         for (int i = 0; i < points.length; i++) {
-            int numOfSameSlope = 0;
-            while (i + numOfSameSlope + 1 < points.length && p.slopeTo(points[i]) == p.slopeTo(points[i + numOfSameSlope + 1])) {
-                numOfSameSlope += 1;
+
+            if (points[i].equals(used)) {
+                continue;
             }
-            if (numOfSameSlope >= 2) {
-                Point[] collinear = Arrays.copyOfRange(points, i - 1, i + numOfSameSlope + 1);
-                // to include point p
-                collinear[0] = p;
-                collinearPoints.enqueue(collinear);
-                numOfSegment += 1;
+
+            // find points with same slope
+            ArrayList<Point> sameSlope = new ArrayList<>();
+            sameSlope.add(p);
+            sameSlope.add(points[i]);
+            int j = 1 + i;
+            while (j < points.length && p.slopeTo(points[i]) == p.slopeTo(points[j])) {
+                sameSlope.add(points[j]);
+                j++;
+            }
+
+            if (sameSlope.size() >= 4) {
+
+                Point[] collinear = sameSlope.toArray(new Point[0]);
+                Arrays.sort(collinear);
+
+                if (newCollinear(collinear)) {
+                    collinearPoints.add(collinear);
+                    LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
+                    lineSegments.add(segment);
+
+                    // set points to used, avoiding repetition
+                    // j has increased out of range when j to end
+                    for (int m = j - 1; m > 0; m--) {
+                        points[m] = used;
+                    }
+                }
+
+
             }
         }
     }
 
-    public int numberOfSegments() {        // the number of line segments
-        return numOfSegment;
+    /**
+     * to test the collinear has in or not
+     */
+    private boolean newCollinear(Point[] collinear) {
+        for (Point[] oldCollinear : collinearPoints) {
+            boolean hasStart = false;
+            boolean hasEnd = false;
+            for (Point point : oldCollinear) {
+                if (point.equals(collinear[0])) {
+                    hasStart = true;
+                } else if (point.equals(collinear[collinear.length - 1])) {
+                    hasEnd = true;
+                }
+            }
+            if (hasStart && hasEnd) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public LineSegment[] segments() {               // the line segments
-        LineSegment[] segments = new LineSegment[numOfSegment];
-        int num = 0;
-        for (Point[] collinear : collinearPoints) {
-            LineSegment segment = new LineSegment(collinear[0], collinear[collinear.length - 1]);
-            segments[num] = segment;
-            num++;
-        }
-        return segments;
+    /**
+     * the number of line segments
+     */
+    public int numberOfSegments() {
+        return lineSegments.size();
+    }
+
+    public LineSegment[] segments() {
+        return lineSegments.toArray(new LineSegment[numberOfSegments()]);
     }
 
 
