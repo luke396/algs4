@@ -53,7 +53,8 @@ public class FastCollinearPoints {
             // "j" is the front index
             // find points with same slope
             j = 1 + i;
-            while (j < points.length && p.slopeTo(points[i]) == p.slopeTo(points[j])) {
+            double iSlope = p.slopeTo(points[i]);
+            while (j < points.length && (iSlope == p.slopeTo(points[j]))) {
                 j++;
             }
             int numOfAdjacent = j - i;
@@ -79,7 +80,7 @@ public class FastCollinearPoints {
     }
 
     public LineSegment[] segments() {
-        return lineSegments.toArray(new LineSegment[numberOfSegments()]);
+        return lineSegments.toArray(new LineSegment[0]);
     }
 
 
